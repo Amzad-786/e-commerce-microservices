@@ -5,8 +5,12 @@ import com.example.products_services.dto.ProductResponse;
 import com.example.products_services.entity.Products;
 import com.example.products_services.repository.ProductRepo;
 import com.example.products_services.service.Product;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProductImpl implements Product {
@@ -33,5 +37,17 @@ public class ProductImpl implements Product {
         res.setStockQuantity(product.getStockQuantity());
         res.setImageUrl(product.getImageUrl());
         return res;
+    }
+    @Override
+    public ProductResponse getById(UUID id){
+        Products product = _repo.findById(id).orElseThrow(() -> new NotFoundException("Product not found with id: " + id));
+        return new ProductResponse(product);
+    }
+    @Override
+    public List<ProductResponse> getAll(){
+        List<Products> products = _repo.findAll();
+        return products.stream()
+                .map(ProductResponse::new)
+                .toList();
     }
 }
